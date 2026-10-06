@@ -23,8 +23,8 @@ from app.core.config import settings
 from app.models import Base
 target_metadata = Base.metadata
 
-# Sincronizar URL de la base de datos con settings (.env)
-config.set_main_option("sqlalchemy.url", settings.DATABASE_URL)
+# Sincronizar URL de la base de datos con settings (.env) con escape de %
+config.set_main_option("sqlalchemy.url", settings.DATABASE_URL.replace("%", "%%"))
 
 # other values from the config, defined by the needs of env.py,
 # can be acquired:

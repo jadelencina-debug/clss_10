@@ -4,6 +4,8 @@ from fastapi.staticfiles import StaticFiles
 from sqlalchemy.orm import Session
 from typing import List, Optional
 from pydantic import BaseModel
+from pathlib import Path
+from sqlalchemy import text
 import uuid
 import os
 
@@ -19,6 +21,8 @@ from app.services import productos as productos_service
 # ── Directorio de imágenes ────────────────────────────────────────────────────
 UPLOAD_DIR = "uploads"
 os.makedirs(UPLOAD_DIR, exist_ok=True)
+Path("uploads/productos").mkdir(parents=True, exist_ok=True)
+Path("app/static/demo").mkdir(parents=True, exist_ok=True)
 
 # Magic bytes de formatos permitidos
 MAGIC_BYTES = {
@@ -300,5 +304,13 @@ def arrepentimiento_publico(
         ) from exc
 
 
-# ── Servir archivos de imágenes subidas ──────────────────────────────────────
+# ── Servir archivos de imágenes subidas y demo ────────────────────────────────
 app.mount("/uploads", StaticFiles(directory=UPLOAD_DIR), name="uploads")
+app.mount("/static", StaticFiles(directory=UPLOAD_DIR), name="static")
+app.mount("/demo", StaticFiles(directory="app/static/demo"), name="demo")
+
+
+@app.get("/salud", tags=["Salud"])
+def salud(db: Session = Depends(get_db)):
+    db.execute(text("SELECT 1"))
+    return {"estado": "ok", "base": "ok"}
